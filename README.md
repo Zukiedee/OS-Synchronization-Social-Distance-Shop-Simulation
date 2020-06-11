@@ -1,4 +1,4 @@
-# OS-Synchronization-Social-Distance-Shop-Simulation
+# OS Synchronization: Social Distance Shop Simulation
 Using synchronization to enforce lockdown level 3 in South Africa
 
 It is designed to run using the command line terminal on a UNIX operating system. 
