@@ -18,18 +18,22 @@ An example of how to compile the program on command line:
 ```
 
 ## How to run the program:
-On the command line: socialDistanceShopSampleSolution.class [arg1] [arg2]
-Where arg1 is the width of the array and arg2 is the height of the array
-Run: ' make run w="arg0" h="arg1" ' 
-	- Where the arguments arg0 and arg1 represent the width and height of the shop floor (array) respectively. 
+On command line, Run: 'make run n="arg0" l="arg1" b="arg2" m="arg3"' 
+
+Where the arguments: 
+	
+	• arg0 represents the number of customers who will arrive 
+	• arg1 represents the length of the shop in grid squares
+	• arg2 represents the breadth of the shop in grid squares
+	• arg3 represents the max number of people allowed into the shop at any point
 	
 An example of how to run the program:
 ```
-        --> make run w="5" h="5"
+        --> make run n="50" l="10" b="10" m="15"
 ```
 
 ## Explanation of program
-
+This program is a multithreaded Java simulation of customers entering a shop under Covid19 pandemic level three regulations, using synchronization mechanisms to ensure that it operates within the specified synchronization constraints.
 
 ## Other commands
 use "make clean" to clean all the class files from the bin directory.
