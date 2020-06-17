@@ -1,4 +1,4 @@
-package socialDistanceShopSampleSolution;
+//package socialDistanceShopSampleSolution;
 
 import java.awt.Color;
 import java.util.Random;
@@ -6,17 +6,18 @@ import java.util.concurrent.atomic.*;
 
 /**
  * Class that keeps track and controls the customers location in the shop grid
+ * Protected with Atomic variables or with synchronized
  * (this is a separate class so don't have to access thread)
  **/
 public class CustomerLocation  { 
 	
-//can protect with Atomic variables or with synchronized	
 	private final int ID; //total customers created
 	private Color myColor;
 	private AtomicBoolean inRoom;
 	private AtomicInteger x;
 	private AtomicInteger y;
 	
+   
 	CustomerLocation(int ID ) {
 		Random rand = new Random();
 		float c = rand.nextFloat();
@@ -43,7 +44,7 @@ public class CustomerLocation  {
    }
 	
 	/**
-    * Setter: Verifies if customer is inside the shop
+    * Setter: Sets customers location to be inside the shop
     **/
 	public  void setInRoom(boolean in) {
 		this.inRoom.set(in);

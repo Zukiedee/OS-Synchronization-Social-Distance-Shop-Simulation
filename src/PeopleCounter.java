@@ -1,4 +1,4 @@
-package socialDistanceShopSampleSolution;
+//package socialDistanceShopSampleSolution;
 
 import java.util.concurrent.Semaphore; 
 
@@ -16,7 +16,10 @@ public class PeopleCounter {
    private Semaphore customers_inside;		               /* keeps track of dishes on the rack */
 	private Semaphore space_available;	                  /* keeps track of empty slots in the rack */
 	   	
-   
+   /** 
+    * Constructor
+    * @param max Maximum amount of people allowed in shop
+    **/
 	PeopleCounter(int max) {
    	this.mutex = new Semaphore(1);                     /* mutex lock to access critical sections in the shop */
 		this.customers_inside = new Semaphore(0); 			/* initially the shop is empty (no customers in side) */
@@ -78,22 +81,23 @@ public class PeopleCounter {
       peopleOutSide++;
       
       mutex.release();                                   /* Releases the lock */
-
       space_available.acquire();			                  /* waits until there is space left in the shop and then decrements space available by 1 */
       customers_inside.release();				            /* Increments number of customers inside the shop */
+   
 	}
 	
 	/**
     * Update counters for a person entering the shop
     **/
 	public void personEntered() throws InterruptedException {
+
    	mutex.acquire();					                     /* Acquire the lock to access the shop entrance */
 
       /* critical section */		
       peopleOutSide--;
 		peopleInside++;
       
-      mutex.release();					                  /* Release the lock */
+      mutex.release();					                     /* Release the lock */
 	}
 
 	/**
