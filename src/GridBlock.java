@@ -6,14 +6,14 @@ import java.util.concurrent.Semaphore;
  * GridBlock class to represent a block in the shop.
  **/
 public class GridBlock {
-	private boolean isOccupied;                           /*changed isOccupied to atomic boolean*/
+	private AtomicBoolean isOccupied;                  
 	private final boolean isExit; 
 	private final boolean isCheckoutCounter;
 	private int [] coords; // the coordinate of the block.
 	private int ID;
 	
 	public static int classCounter=0;
-   private Semaphore mutex;
+   private Semaphore mutex;                              /* for mutual exclusion */
 	
    /** 
     * Constructor
@@ -24,10 +24,12 @@ public class GridBlock {
       mutex = new Semaphore(1);                                 /*added */
 		isExit=exitBlock;
 		isCheckoutCounter=checkoutBlock;
-		isOccupied =false;                                     /*original */
-		ID=classCounter;
-      
+		//isOccupied =false;                                       /*original */
+      isOccupied = new AtomicBoolean(false);                     /*changed */
+		mutex.acquire();
+      ID=classCounter;
 		classCounter++;
+      mutex.release();
 	}
 	
    /** 
@@ -56,12 +58,13 @@ public class GridBlock {
     * for customer to move to a block
     **/
 	public boolean get() throws InterruptedException {
+      //mutex.acquire();
       if(!occupied()) {
-         //mutex.acquire();
-         isOccupied = true;
-         //mutex.release();
+         //isOccupied = true;
+         isOccupied.set(true);
          return true;
       }
+      //mutex.release();
 		return false;
 	}
 		
@@ -69,14 +72,16 @@ public class GridBlock {
     * for customer to leave a block
     **/
 	public  void release() {
-		isOccupied =false;                                
+		//isOccupied =false;  
+      isOccupied.set(false);
+                              
 	}
 	
 	/**
     * Getter: Verifies if block is occupied by another customer
     **/
-	public boolean occupied() {                         
-		return isOccupied;
+	public boolean occupied() {                    
+		return isOccupied.get();
 	}
 	
 	/**

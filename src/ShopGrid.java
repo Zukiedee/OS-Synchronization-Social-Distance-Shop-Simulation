@@ -11,11 +11,17 @@ public class ShopGrid {
 	public final int checkout_y;
 	private final static int minX =5;//minimum x dimension
 	private final static int minY =5;//minimum y dimension
+   private Semaphore mutex;
+   private Semaphore mutexA;
+
        
    /** 
     * Empty constructor 
     **/
 	ShopGrid() throws InterruptedException {
+      mutex = new Semaphore(1);
+      mutexA = new Semaphore(1);
+
 		this.x=20;
 		this.y=20;
 		this.checkout_y=y-3;
@@ -32,7 +38,10 @@ public class ShopGrid {
     * @param maxPeople maximum amount of people allowed in the shop
     **/
 	ShopGrid(int x, int y, int [][] exitBlocks,int maxPeople) throws InterruptedException {
-		if (x<minX) x=minX; //minimum x
+      mutex = new Semaphore(1);
+      mutexA = new Semaphore(1);
+
+      if (x<minX) x=minX; //minimum x
 		if (y<minY) y=minY; //minimum y
 		this.x=x;
 		this.y=y;
@@ -97,15 +106,18 @@ public class ShopGrid {
 	/**
     * called by customer when entering shop
     **/
-	public synchronized GridBlock enterShop() throws InterruptedException  {
+	public GridBlock enterShop() throws InterruptedException  {
+         mutexA.acquire();
+         while (!whereEntrance().get()){/*wait*/}
 		   GridBlock entrance = whereEntrance();
+         mutexA.release();
 		return entrance;
 	}
 		
 	/**
     * called when customer wants to move to a location in the shop
     **/
-	public synchronized GridBlock move(GridBlock currentBlock,int step_x, int step_y) throws InterruptedException {  
+	public GridBlock move(GridBlock currentBlock,int step_x, int step_y) throws InterruptedException {  
 		//try to move in 
       
 		int c_x= currentBlock.getX();
@@ -127,6 +139,7 @@ public class ShopGrid {
       
 
 		GridBlock newBlock = Blocks[new_x][new_y];
+      mutex.acquire();
 			if (newBlock.get())  {  //get successful because block not occupied 
 				currentBlock.release(); //must release current block
 		   }
@@ -134,6 +147,7 @@ public class ShopGrid {
 				newBlock=currentBlock;
 				///Block occupied - giving up
 			}
+      mutex.release();
       
 		return newBlock;
 	} 
