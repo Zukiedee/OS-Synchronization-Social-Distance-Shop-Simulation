@@ -1,4 +1,4 @@
-//package socialDistanceShopSampleSolution;
+package socialDistanceShopSampleSolution;
 
 import java.awt.Color;
 import java.util.Random;
