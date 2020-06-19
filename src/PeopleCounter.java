@@ -4,6 +4,9 @@ import java.util.concurrent.Semaphore;
 
 /** 
  * Class to keep track of people that are inside, outside and have left the shop
+ * 
+ * @author Zukiswa Lobola
+ * @since 2020-06-22 
  **/
 public class PeopleCounter {
 	private int peopleOutSide; //counter for people arrived but not yet in the building
@@ -117,6 +120,7 @@ public class PeopleCounter {
 
 	/**
     * Reset - not really used
+    * Synchronized block; so only one thread can execute at a time
     **/
 	synchronized public void resetScore() {
 		peopleInside = 0;

@@ -4,6 +4,9 @@ import java.util.concurrent.Semaphore;
 
 /**
  * GridBlock class to represent a block in the shop.
+ * 
+ * @author Zukiswa Lobola
+ * @since 2020-06-22
  **/
 public class GridBlock {
 	private AtomicBoolean isOccupied;                  
@@ -13,7 +16,7 @@ public class GridBlock {
 	private int ID;
 	
 	public static int classCounter=0;
-   private Semaphore mutex;                              /* for mutual exclusion */
+   private Semaphore mutex;                                       /* lock for mutual exclusion */
 	
    /** 
     * Constructor
@@ -21,15 +24,14 @@ public class GridBlock {
     * @param checkoutBlock
     **/
 	GridBlock(boolean exitBlock, boolean checkoutBlock) throws InterruptedException {
-      mutex = new Semaphore(1);                                 /*added */
+      mutex = new Semaphore(1);                             
 		isExit=exitBlock;
 		isCheckoutCounter=checkoutBlock;
-		//isOccupied =false;                                       /*original */
-      isOccupied = new AtomicBoolean(false);                     /*changed */
-		mutex.acquire();
+      isOccupied = new AtomicBoolean(false);                      /*changed to AtomicBoolean */
+		mutex.acquire();                                            /* Acquire the lock to update class counter and thread ID */
       ID=classCounter;
 		classCounter++;
-      mutex.release();
+      mutex.release();                                            /* Release the lock */
 	}
 	
    /** 
@@ -46,11 +48,13 @@ public class GridBlock {
 	
 	/**
     * Getter: Returns x coordinate of customer location in shop
+    * @return Returns x coordinate of the block in the shop
     **/
 	public  int getX() {return coords[0];}  
 	
 	/**
     * Getter: Returns y coordinate of customer location in shop
+    * @return Returns y coordinate of the block in the shop
     **/
 	public  int getY() {return coords[1];}
 	
@@ -58,13 +62,10 @@ public class GridBlock {
     * for customer to move to a block
     **/
 	public boolean get() throws InterruptedException {
-      //mutex.acquire();
       if(!occupied()) {
-         //isOccupied = true;
          isOccupied.set(true);
          return true;
       }
-      //mutex.release();
 		return false;
 	}
 		
@@ -72,13 +73,13 @@ public class GridBlock {
     * for customer to leave a block
     **/
 	public  void release() {
-		//isOccupied =false;  
       isOccupied.set(false);
                               
 	}
 	
 	/**
     * Getter: Verifies if block is occupied by another customer
+    * @return boolean Returns true if the block is occupied. 
     **/
 	public boolean occupied() {                    
 		return isOccupied.get();
@@ -86,6 +87,7 @@ public class GridBlock {
 	
 	/**
     * Getter: Verifies if block is exit
+    * @return boolean Returns true if the block is the shop exit.
     **/
 	public  boolean isExit() {
 		return isExit;	
@@ -100,6 +102,9 @@ public class GridBlock {
 	
 	/**
     * Getter: Gets customer ID
+    * @param int Returns unique customer ID.
     **/
-	public int getID() {return this.ID;}
+	public int getID() {
+      return this.ID;
+   }
 }

@@ -18,13 +18,13 @@ class outOfGridBoundsException extends Exception {
 	}
 public class SocialDistancingShop {
 
-	static int noPeople=20;
+	static int noPeople=50;
    static int frameX=400;
 	static int frameY=500;
 	static int yLimit=400;
 	static int gridX=10; //number of x grids in shop - default value if not provided on command line
 	static int gridY=10; //number of y grids in shop - default value if not provided on command line
-	static int max=5; //max number of customers - default value if not provided on command line
+	static int max=30; //max number of customers - default value if not provided on command line
 
 	
 	static Customer[] customers; // array for customer threads
