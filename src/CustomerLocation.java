@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.*;
 
 /**
- * Class that keeps track and controls the customers location in the shop grid
+ * Class that keeps track and updates the customers location in the shop grid
  * Protected with Atomic variables or with synchronized
  * (this is a separate class so don't have to access thread)
  * 

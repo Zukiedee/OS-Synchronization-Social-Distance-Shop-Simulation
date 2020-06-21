@@ -3,6 +3,9 @@ import java.util.concurrent.Semaphore;
 
 /**
  * Class to represent the shop, as a grid of gridblocks
+ *
+ * @author Zukiswa Lobola
+ * @since 2020-06-22
  **/
 public class ShopGrid {
 	private GridBlock [][] Blocks;
@@ -12,15 +15,16 @@ public class ShopGrid {
 	private final static int minX =5;//minimum x dimension
 	private final static int minY =5;//minimum y dimension
    private Semaphore mutex;
-   private Semaphore mutexA;
+   private Semaphore mutex2;
 
-       
+
    /** 
     * Empty constructor 
+    * @throws InterruptedException On error.
     **/
 	ShopGrid() throws InterruptedException {
       mutex = new Semaphore(1);
-      mutexA = new Semaphore(1);
+      mutex2 = new Semaphore(1);
 
 		this.x=20;
 		this.y=20;
@@ -38,8 +42,8 @@ public class ShopGrid {
     * @param maxPeople maximum amount of people allowed in the shop
     **/
 	ShopGrid(int x, int y, int [][] exitBlocks,int maxPeople) throws InterruptedException {
-      mutex = new Semaphore(1);
-      mutexA = new Semaphore(1);
+      mutex = new Semaphore(1);                                   /*mutual exclusion lock #1 */
+      mutex2 = new Semaphore(1);                                  /*mutual exclusion lock #2 */
 
       if (x<minX) x=minX; //minimum x
 		if (y<minY) y=minY; //minimum y
@@ -96,6 +100,7 @@ public class ShopGrid {
 
 	/**
     * is a position a valid grid position?
+    * @return boolean Returns true if the block coordinates are inside the GridBlock of the shop.
     **/
 	public  boolean inGrid(int i, int j) {
 		if ((i>=x) || (j>=y) ||(i<0) || (j<0)) 
@@ -104,18 +109,28 @@ public class ShopGrid {
 	}
 	
 	/**
-    * called by customer when entering shop
+    * Called by customer when entering shop.  
+    * Customers can only enter one at a time, and have to wait 
+    * if another customer is occupying the entrance block.
+    * @throws InterruptedException On mutex lock error.
+    * @return GridBlock extrance block coordinates.
     **/
 	public GridBlock enterShop() throws InterruptedException  {
-         mutexA.acquire();
-         while (!whereEntrance().get()){/*wait*/}
+         mutex2.acquire();                                   /* acquire lock to access entrance block */
+         /* Critical section */
+         while (!whereEntrance().get()){/*wait*/}            /* while the entrance is occupied, wait until it is not occupied */
 		   GridBlock entrance = whereEntrance();
-         mutexA.release();
+         mutex2.release();                                   /* release lock to access entrance block */
 		return entrance;
 	}
 		
 	/**
-    * called when customer wants to move to a location in the shop
+    * Called when customer wants to move to a location in the shop
+    * @param currentBlock The current block the customer is occcupying
+    * @param step_x Movement in the x direction
+    * @param step_y Movement in the y direction
+    * @throws InterruptedException On mutex lock error.
+    * @return GridBlock coordinates of the new block the customer is moving to.
     **/
 	public GridBlock move(GridBlock currentBlock,int step_x, int step_y) throws InterruptedException {  
 		//try to move in 
@@ -139,7 +154,8 @@ public class ShopGrid {
       
 
 		GridBlock newBlock = Blocks[new_x][new_y];
-      mutex.acquire();
+      mutex.acquire();                                               /* aquire lock so customers move into block one at a time */
+      /* Critical section */
 			if (newBlock.get())  {  //get successful because block not occupied 
 				currentBlock.release(); //must release current block
 		   }
@@ -147,13 +163,13 @@ public class ShopGrid {
 				newBlock=currentBlock;
 				///Block occupied - giving up
 			}
-      mutex.release();
+      mutex.release();                                                /* release lock */
       
 		return newBlock;
 	} 
 	
 	/**
-    * called by customer to exit the shop
+    * Called by customer to exit the shop
     */
 	public void leaveShop(GridBlock currentBlock)   {
 		currentBlock.release();
